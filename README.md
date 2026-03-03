@@ -20,14 +20,14 @@ services:
     ports:
       - "8080:80"
     environment:
-      - BACKEND_URL=http://localhost:3001
+      - BACKEND_URL=http://localhost:3000
     depends_on:
       - backend
 
   backend:
     image: ghcr.io/mtib/todos-backend:main
     ports:
-      - "3001:3001"
+      - "3000:3000"
     volumes:
       - ./data:/app/data
 ```
