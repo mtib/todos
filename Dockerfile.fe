@@ -1,0 +1,17 @@
+FROM oven/bun:latest AS builder
+WORKDIR /app
+COPY package.json ./
+# If bun.lockb exists, this will use it, otherwise it generates it
+RUN bun install
+COPY . .
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+RUN bun run build
+
+FROM caddy:alpine
+# Copy custom Caddyfile
+COPY Caddyfile /etc/caddy/Caddyfile
+# Copy built files to the directory Caddy serves
+COPY --from=builder /app/dist /usr/share/caddy
+EXPOSE 80
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]

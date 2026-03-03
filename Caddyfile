@@ -1,0 +1,23 @@
+:80 {
+    # Proxy to backend API using environment variable
+    handle /api/* {
+        reverse_proxy {$BACKEND_URL:backend:3000}
+    }
+
+    # Static file serving
+    handle {
+        root * /usr/share/caddy
+        file_server {
+            precompressed
+        }
+
+        # Caching for static assets
+        @static {
+            path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ico
+        }
+        header @static Cache-Control "public, max-age=31536000, immutable"
+
+        # SPA fallback
+        try_files {path} /index.html
+    }
+}
