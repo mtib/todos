@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# Hierarchical Todo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A powerful, real-time synchronized hierarchical todo list manager with PWA support and dark mode.
 
-Currently, two official plugins are available:
+## 🚀 Running with Docker (Recommended)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The easiest way to run the app is using the pre-built images hosted on GitHub Container Registry (GHCR).
 
-## React Compiler
+### Prerequisites
+- Docker
+- Docker Compose
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Fast Start
+Create a `docker-compose.yml` file with the following content:
 
-## Expanding the ESLint configuration
+```yaml
+services:
+  frontend:
+    image: ghcr.io/mtib/todos-frontend:main
+    ports:
+      - "8080:80"
+    environment:
+      - BACKEND_URL=http://localhost:3001
+    depends_on:
+      - backend
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+  backend:
+    image: ghcr.io/mtib/todos-backend:main
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/data
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Then run:
+```bash
+docker compose up -d
 ```
+The app will be available at [http://localhost:8080](http://localhost:8080).
+
+## 🛠️ Development
+
+### Prerequisites
+- [Bun](https://bun.sh) (latest)
+
+### Installation
+```bash
+bun install
+```
+
+### Running Locally
+1. Start the backend:
+```bash
+bun server.ts
+```
+2. Start the frontend:
+```bash
+bun run dev
+```
+
+## ✨ Features
+- **Hierarchical Tasks**: Infinite nesting of tasks.
+- **Real-time Sync**: Uses WebSockets for instant updates across devices.
+- **PWA**: Installable on mobile and desktop with offline support.
+- **Dark Mode**: Automatic theme detection and manual toggle.
+- **Search**: Advanced search with `@labels`, text, and task IDs (`T42`).
+- **Markdown Descriptions**: Rich text support for task details.
+
+## 🏗️ CI/CD
+This repository uses GitHub Actions to:
+- Verify builds on every Pull Request.
+- Automatically build and push Docker images to GHCR on pushes to `main`.
+
+---
+Built with ❤️ by mtib
