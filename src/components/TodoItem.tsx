@@ -11,8 +11,6 @@ interface TodoItemProps {
     node: TodoNode
     depth?: number
     isExpanded: boolean
-    isLastChild: boolean
-    isLastChildPath: boolean[]
     onToggleExpand: (id: number) => void
     onToggleTodo: (id: number, completed: boolean) => void
     onDeleteTodo: (id: number) => void
@@ -22,15 +20,13 @@ interface TodoItemProps {
     onToggleRecursive: (node: TodoNode, expand: boolean) => void
     subtaskInput: string
     onSubtaskInputChange: (parentId: number, text: string) => void
-    renderChildren: (nodes: TodoNode[], depth: number, parentIsLastChildPath: boolean[]) => React.ReactNode
+    renderChildren: (nodes: TodoNode[], depth: number) => React.ReactNode
 }
 
 export function TodoItem({
     node,
     depth = 0,
     isExpanded,
-    isLastChild,
-    isLastChildPath,
     onToggleExpand,
     onToggleTodo,
     onDeleteTodo,
@@ -110,35 +106,15 @@ export function TodoItem({
     }
 
     return (
-        <div className="group/item py-1 relative">
-            {isLastChildPath.map((isLast, i) => {
-                if (i === 0) return null; // Don't draw a line for the root's placeholder
-                const leftPosition = `${(i - 1) * 28 + 15}px`;
-                return !isLast && (
-                    <div
-                        key={i}
-                        className="absolute top-0 w-px bg-slate-200 dark:bg-slate-800 h-full"
-                        style={{ left: leftPosition, top: '-4px', height: 'calc(100% + 34px)' }}
-                    />
-                );
-            })}
-            {depth > 0 && (
-                <>
-                    {/* Horizontal line to child */}
-                    <div className="absolute top-9 h-px w-[18px] bg-slate-200 dark:bg-slate-800" style={{ left: `${(depth - 1) * 28 + 15}px` }} />
-                </>
-            )}
-            {hasChildren && !isLastChild && (
-                <div
-                    className="absolute w-px bg-slate-200 dark:bg-slate-800"
-                    style={{ left: `${depth * 28 + 15}px`, top: '0', height: 'calc(100% + 16px)' }}
-                />
-            )}
+        <div
+            className="group/item"
+            style={{
+                marginLeft: depth > 0 ? '32px' : '0px'
+            }}
+        >
             <div
-                style={{ marginLeft: `${Math.min(depth * 28, 120)}px` }}
-
                 className={cn(
-                    "flex flex-col rounded-lg transition-all duration-200 border relative overflow-hidden",
+                    "flex flex-col rounded-lg transition-all duration-200 border overflow-hidden relative",
                     "bg-card/40 dark:bg-card/10 border-slate-200 dark:border-slate-800 shadow-sm",
                     "hover:border-slate-300 dark:hover:border-slate-700 hover:bg-card/60 dark:hover:bg-card/15 hover:shadow-md",
                     "active:scale-[0.99] md:active:scale-100 transition-transform",
@@ -146,7 +122,7 @@ export function TodoItem({
                 )}
             >
                 {/* Main Header Row */}
-                <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2.5">
+                <div className="flex items-center gap-2 sm:gap-3 px-3 py-2.5">
                     <div
                         className="cursor-pointer text-muted-foreground hover:text-foreground shrink-0 transition-transform active:scale-95 p-1"
                         onClick={() => onToggleExpand(node.id)}
@@ -230,7 +206,7 @@ export function TodoItem({
                                 e.preventDefault()
                                 onAddSubtask(subtaskInput, node.id)
                             }}
-                            className="flex items-center space-x-1"
+                            className="flex items-center gap-1"
                         >
                             <Input
                                 placeholder="Add..."
@@ -282,7 +258,7 @@ export function TodoItem({
 
                 {/* Seamless Integrated Description Section */}
                 {(showDescription || node.description || editingDescription) && (
-                    <div className="px-3 sm:px-10 pb-4">
+                    <div className="px-3 py-3 border-t border-slate-100 dark:border-slate-800/50">
                         {editingDescription ? (
                             <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                                 <textarea
@@ -309,7 +285,7 @@ export function TodoItem({
                             </div>
                         ) : node.description ? (
                             <div
-                                className="cursor-text group/desc relative border-t border-slate-100 dark:border-slate-800/50 pt-3"
+                                className="cursor-text group/desc"
                                 onClick={handleDescriptionClick}
                             >
                                 <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -319,7 +295,7 @@ export function TodoItem({
                                 </div>
                             </div>
                         ) : (showDescription && !node.description) && (
-                            <div className="border-t border-slate-100 dark:border-slate-800/50 pt-3">
+                            <div>
                                 <Button
                                     variant="ghost"
                                     className="h-10 sm:h-8 w-full border border-dashed text-xs text-muted-foreground hover:text-foreground"
@@ -337,7 +313,7 @@ export function TodoItem({
 
                 {/* Progress Bar along the bottom */}
                 {node.childCount > 0 && (
-                    <div className="absolute bottom-0 left-0 right-0 h-[4px] sm:h-[3px] bg-slate-100/30 dark:bg-purple-900/10">
+                    <div className="h-1 bg-slate-100/30 dark:bg-purple-900/10 overflow-hidden">
                         <div
                             className="h-full bg-purple-600 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-in-out"
                             style={{ width: `${node.progress}%` }}
@@ -347,8 +323,8 @@ export function TodoItem({
             </div>
 
             {isExpanded && node.children.length > 0 && (
-                <div className="mt-1">
-                    {renderChildren(node.children, depth + 1, isLastChildPath)}
+                <div className="space-y-2 pt-2">
+                    {renderChildren(node.children, depth + 1)}
                 </div>
             )}
         </div>

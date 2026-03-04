@@ -29,31 +29,25 @@ export function TodoTree({
     onSubtaskInputChange
 }: TodoTreeProps) {
 
-    const renderChildren = (nodes: TodoNode[], depth: number, parentIsLastChildPath: boolean[] = []) => {
-        return nodes.map((node, index) => {
-            const isLastChild = index === nodes.length - 1;
-            const isLastChildPath = [...parentIsLastChildPath, isLastChild];
-            return (
-                <TodoItem
-                    key={node.id}
-                    node={node}
-                    depth={depth}
-                    isExpanded={!!expanded[node.id]}
-                    isLastChild={isLastChild}
-                    isLastChildPath={isLastChildPath}
-                    onToggleExpand={onToggleExpand}
-                    onToggleTodo={onToggleTodo}
-                    onDeleteTodo={onDeleteTodo}
-                    onRenameTodo={onRenameTodo}
-                    onUpdateTodo={onUpdateTodo}
-                    onAddSubtask={onAddSubtask}
-                    onToggleRecursive={onToggleRecursive}
-                    subtaskInput={subtaskInputs[node.id] || ''}
-                    onSubtaskInputChange={onSubtaskInputChange}
-                    renderChildren={renderChildren}
-                />
-            )
-        })
+    const renderChildren = (nodes: TodoNode[], depth: number) => {
+        return nodes.map((node) => (
+            <TodoItem
+                key={node.id}
+                node={node}
+                depth={depth}
+                isExpanded={!!expanded[node.id]}
+                onToggleExpand={onToggleExpand}
+                onToggleTodo={onToggleTodo}
+                onDeleteTodo={onDeleteTodo}
+                onRenameTodo={onRenameTodo}
+                onUpdateTodo={onUpdateTodo}
+                onAddSubtask={onAddSubtask}
+                onToggleRecursive={onToggleRecursive}
+                subtaskInput={subtaskInputs[node.id] || ''}
+                onSubtaskInputChange={onSubtaskInputChange}
+                renderChildren={renderChildren}
+            />
+        ))
     }
 
     if (tree.length === 0) {
@@ -66,7 +60,7 @@ export function TodoTree({
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             {renderChildren(tree, 0)}
         </div>
     )
