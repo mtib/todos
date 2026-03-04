@@ -1,7 +1,12 @@
 import { Database } from "bun:sqlite";
 import path from "path";
 
-const dbDir = process.env.DB_DIR || process.cwd();
+import fs from "fs";
+
+const dbDir = process.env.DB_DIR || path.join(process.cwd(), "data");
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+}
 const dbPath = path.join(dbDir, "todos.db");
 const db = new Database(dbPath, { create: true });
 
