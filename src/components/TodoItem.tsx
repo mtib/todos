@@ -12,6 +12,7 @@ interface TodoItemProps {
     depth?: number
     isExpanded: boolean
     isLastChild: boolean
+    isLastChildPath: boolean[]
     onToggleExpand: (id: number) => void
     onToggleTodo: (id: number, completed: boolean) => void
     onDeleteTodo: (id: number) => void
@@ -21,7 +22,7 @@ interface TodoItemProps {
     onToggleRecursive: (node: TodoNode, expand: boolean) => void
     subtaskInput: string
     onSubtaskInputChange: (parentId: number, text: string) => void
-    renderChildren: (nodes: TodoNode[], depth: number) => React.ReactNode
+    renderChildren: (nodes: TodoNode[], depth: number, parentIsLastChildPath: boolean[]) => React.ReactNode
 }
 
 export function TodoItem({
@@ -29,6 +30,7 @@ export function TodoItem({
     depth = 0,
     isExpanded,
     isLastChild,
+    isLastChildPath,
     onToggleExpand,
     onToggleTodo,
     onDeleteTodo,
@@ -109,19 +111,26 @@ export function TodoItem({
 
     return (
         <div className="group/item py-1 relative">
+            {isLastChildPath.map((isLast, i) => {
+                if (i === 0) return null; // Don't draw a line for the root's placeholder
+                const leftPosition = `${(i - 1) * 28 + 12}px`;
+                return !isLast && (
+                    <div
+                        key={i}
+                        className="absolute top-0 w-px bg-slate-200 dark:bg-slate-800 h-full"
+                        style={{ left: leftPosition }}
+                    />
+                );
+            })}
             {depth > 0 && (
                 <>
-                    {/* Vertical line from parent */}
-                    <div className={cn(
-                        "absolute -left-3.5 top-0 w-px bg-slate-200 dark:bg-slate-800",
-                        isLastChild ? "h-7" : "h-full"
-                    )} />
                     {/* Horizontal line to child */}
-                    <div className="absolute -left-3.5 top-6 h-px w-3 bg-slate-200 dark:bg-slate-800" />
+                    <div className="absolute top-6 h-px w-3.5 bg-slate-200 dark:bg-slate-800" style={{ left: `${(depth - 1) * 28 + 12}px` }} />
                 </>
             )}
             <div
                 style={{ marginLeft: `${Math.min(depth * 28, 120)}px` }}
+
                 className={cn(
                     "flex flex-col rounded-lg transition-all duration-200 border relative overflow-hidden",
                     "bg-card/40 dark:bg-card/10 border-slate-200 dark:border-slate-800 shadow-sm",
@@ -333,7 +342,7 @@ export function TodoItem({
 
             {isExpanded && node.children.length > 0 && (
                 <div className="mt-1">
-                    {renderChildren(node.children, depth + 1)}
+                    {renderChildren(node.children, depth + 1, isLastChildPath)}
                 </div>
             )}
         </div>

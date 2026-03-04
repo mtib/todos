@@ -29,26 +29,31 @@ export function TodoTree({
     onSubtaskInputChange
 }: TodoTreeProps) {
 
-    const renderChildren = (nodes: TodoNode[], depth: number) => {
-        return nodes.map((node, index) => (
-            <TodoItem
-                key={node.id}
-                node={node}
-                depth={depth}
-                isExpanded={!!expanded[node.id]}
-                isLastChild={index === nodes.length - 1}
-                onToggleExpand={onToggleExpand}
-                onToggleTodo={onToggleTodo}
-                onDeleteTodo={onDeleteTodo}
-                onRenameTodo={onRenameTodo}
-                onUpdateTodo={onUpdateTodo}
-                onAddSubtask={onAddSubtask}
-                onToggleRecursive={onToggleRecursive}
-                subtaskInput={subtaskInputs[node.id] || ''}
-                onSubtaskInputChange={onSubtaskInputChange}
-                renderChildren={renderChildren}
-            />
-        ))
+    const renderChildren = (nodes: TodoNode[], depth: number, parentIsLastChildPath: boolean[] = []) => {
+        return nodes.map((node, index) => {
+            const isLastChild = index === nodes.length - 1;
+            const isLastChildPath = [...parentIsLastChildPath, isLastChild];
+            return (
+                <TodoItem
+                    key={node.id}
+                    node={node}
+                    depth={depth}
+                    isExpanded={!!expanded[node.id]}
+                    isLastChild={isLastChild}
+                    isLastChildPath={isLastChildPath}
+                    onToggleExpand={onToggleExpand}
+                    onToggleTodo={onToggleTodo}
+                    onDeleteTodo={onDeleteTodo}
+                    onRenameTodo={onRenameTodo}
+                    onUpdateTodo={onUpdateTodo}
+                    onAddSubtask={onAddSubtask}
+                    onToggleRecursive={onToggleRecursive}
+                    subtaskInput={subtaskInputs[node.id] || ''}
+                    onSubtaskInputChange={onSubtaskInputChange}
+                    renderChildren={renderChildren}
+                />
+            )
+        })
     }
 
     if (tree.length === 0) {
