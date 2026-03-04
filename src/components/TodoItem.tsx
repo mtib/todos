@@ -113,19 +113,19 @@ export function TodoItem({
         <div className="group/item py-1 relative">
             {isLastChildPath.map((isLast, i) => {
                 if (i === 0) return null; // Don't draw a line for the root's placeholder
-                const leftPosition = `${(i - 1) * 28 + 15}px`;
+                const leftPosition = `${(i - 1) * 28 + 19}px`;
                 return !isLast && (
                     <div
                         key={i}
                         className="absolute top-0 w-px bg-slate-200 dark:bg-slate-800 h-full"
-                        style={{ left: leftPosition, top: '-4px', height: 'calc(100% + 20px)' }}
+                        style={{ left: leftPosition, top: '-4px', height: 'calc(100% + 36px)' }}
                     />
                 );
             })}
             {depth > 0 && (
                 <>
                     {/* Horizontal line to child */}
-                    <div className="absolute top-5 h-px w-2.5 bg-slate-200 dark:bg-slate-800" style={{ left: `${(depth - 1) * 28 + 15}px` }} />
+                    <div className="absolute top-7 h-px w-3.5 bg-slate-200 dark:bg-slate-800" style={{ left: `${(depth - 1) * 28 + 19}px` }} />
                 </>
             )}
             <div
