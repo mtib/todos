@@ -19,7 +19,9 @@ function App() {
     updateTodo,
     toggleRecursive,
     searchQuery,
-    setSearchQuery
+    setSearchQuery,
+    showCompleted,
+    setShowCompleted
   } = useTodos()
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -50,7 +52,7 @@ function App() {
     <div className="min-h-screen bg-background transition-colors duration-300">
       {/* Theme Toggle in absolute position */}
       <div className="fixed top-4 right-4 z-50">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border">
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors">
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
       </div>
@@ -61,6 +63,8 @@ function App() {
             onAddTodo={(text) => addTodo(text)}
             onSearch={setSearchQuery}
             searchQuery={searchQuery}
+            showCompleted={showCompleted}
+            onToggleCompleted={() => setShowCompleted(!showCompleted)}
           />
 
           <div className="w-full">

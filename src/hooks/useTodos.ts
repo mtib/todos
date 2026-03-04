@@ -7,6 +7,10 @@ export function useTodos() {
     const [expanded, setExpanded] = useState<Record<number, boolean>>({})
     const [subtaskInputs, setSubtaskInputs] = useState<Record<number, string>>({})
     const [isLoading, setIsLoading] = useState(true)
+    const [showCompleted, setShowCompleted] = useState<boolean>(() => {
+        const saved = localStorage.getItem('showCompleted')
+        return saved === null ? true : saved === 'true'
+    })
 
     const fetchTodos = useCallback(async () => {
         try {
@@ -18,6 +22,10 @@ export function useTodos() {
             setIsLoading(false)
         }
     }, [])
+
+    useEffect(() => {
+        localStorage.setItem('showCompleted', String(showCompleted))
+    }, [showCompleted])
 
     useEffect(() => {
         fetchTodos()
@@ -97,6 +105,10 @@ export function useTodos() {
         const searchId = idMatch ? parseInt(idMatch[1]) : null
 
         const filteredTodos = todos.filter(todo => {
+            // If hide completed and it is completed, filter it out
+            // BUT only if we are not searching for its specific ID
+            if (!showCompleted && todo.completed && searchId !== todo.id) return false
+
             if (!q) return true
             if (searchId !== null) return todo.id === searchId
 
@@ -146,8 +158,8 @@ export function useTodos() {
             })
         }
 
-        return q ? filterBySearch(rootNodes) : rootNodes
-    }, [todos, searchQuery])
+        return (q || !showCompleted) ? filterBySearch(rootNodes) : rootNodes
+    }, [todos, searchQuery, showCompleted])
 
     return {
         todos,
@@ -164,6 +176,8 @@ export function useTodos() {
         updateTodo,
         toggleRecursive,
         searchQuery,
-        setSearchQuery
+        setSearchQuery,
+        showCompleted,
+        setShowCompleted
     }
 }
