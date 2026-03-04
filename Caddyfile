@@ -1,7 +1,10 @@
 :80 {
     # Proxy to backend API using environment variable
     handle /api/* {
-        reverse_proxy {$BACKEND_URL:backend:3000}
+        reverse_proxy {$BACKEND_URL:backend:3000} {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
     }
 
     # Static file serving

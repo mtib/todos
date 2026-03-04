@@ -4,12 +4,20 @@ import { api } from '../lib/api'
 
 export interface SystemStats {
     taskCount: number;
+    currentUserTasks: number;
     dbSize: number;
     memory: number;
+    username: string;
+}
+
+export interface User {
+    id: number;
+    username: string;
 }
 
 export function useTodos() {
     const [todos, setTodos] = useState<Todo[]>([])
+    const [users, setUsers] = useState<User[]>([])
     const [stats, setStats] = useState<SystemStats | null>(null)
     const [expanded, setExpanded] = useState<Record<number, boolean>>({})
     const [subtaskInputs, setSubtaskInputs] = useState<Record<number, string>>({})
@@ -19,24 +27,44 @@ export function useTodos() {
         return saved === null ? true : saved === 'true'
     })
 
+    const [selectedUserIds, setSelectedUserIds] = useState<number[]>(() => {
+        const saved = localStorage.getItem('selectedUserIds')
+        return saved ? JSON.parse(saved) : []
+    })
+
     const fetchData = useCallback(async () => {
         try {
-            const [todosData, statsData] = await Promise.all([
-                api.fetchTodos(),
+            const [usersData, statsData] = await Promise.all([
+                api.fetchUsers(),
                 api.fetchStats()
             ])
-            setTodos(todosData)
+            setUsers(usersData)
             setStats(statsData)
+
+            // If no users selected, by default select all
+            let currentSelected = selectedUserIds
+            if (currentSelected.length === 0 && usersData.length > 0) {
+                currentSelected = usersData.map((u: User) => u.id)
+                setSelectedUserIds(currentSelected)
+                localStorage.setItem('selectedUserIds', JSON.stringify(currentSelected))
+            }
+
+            const todosData = await api.fetchTodos(currentSelected)
+            setTodos(todosData)
         } catch (error) {
             console.error("Failed to fetch data:", error)
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [selectedUserIds])
 
     useEffect(() => {
         localStorage.setItem('showCompleted', String(showCompleted))
     }, [showCompleted])
+
+    useEffect(() => {
+        localStorage.setItem('selectedUserIds', JSON.stringify(selectedUserIds))
+    }, [selectedUserIds])
 
     useEffect(() => {
         fetchData()
@@ -191,10 +219,9 @@ export function useTodos() {
         todos,
         todoTree,
         stats,
-        expanded,
-        setExpanded,
-        subtaskInputs,
-        setSubtaskInputs,
+        users,
+        selectedUserIds,
+        setSelectedUserIds,
         isLoading,
         addTodo,
         toggleTodo,

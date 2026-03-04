@@ -1,8 +1,12 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export const api = {
-    async fetchTodos() {
-        const res = await fetch(`${API_BASE_URL}/api/todos`);
+    async fetchTodos(userIds?: number[]) {
+        let url = `${API_BASE_URL}/api/todos`;
+        if (userIds && userIds.length > 0) {
+            url += `?users=${userIds.join(',')}`;
+        }
+        const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to fetch todos');
         return res.json();
     },
@@ -10,6 +14,12 @@ export const api = {
     async fetchStats() {
         const res = await fetch(`${API_BASE_URL}/api/stats`);
         if (!res.ok) throw new Error('Failed to fetch stats');
+        return res.json();
+    },
+
+    async fetchUsers() {
+        const res = await fetch(`${API_BASE_URL}/api/users`);
+        if (!res.ok) throw new Error('Failed to fetch users');
         return res.json();
     },
 
