@@ -35,9 +35,7 @@ db.run(`
 `);
 
 // Migrations for existing DBs
-try {
-    db.run("ALTER TABLE todos ADD COLUMN owner_id INTEGER REFERENCES users(id);");
-} catch (e) { }
+db.run("ALTER TABLE todos ADD COLUMN owner_id INTEGER REFERENCES users(id);");
 
 db.run(`
   CREATE TABLE IF NOT EXISTS labels (
@@ -106,7 +104,7 @@ const server = Bun.serve({
                   LEFT JOIN users u ON t.owner_id = u.id
                 `;
 
-                const params: any[] = [];
+                const params: Array<string | number> = [];
                 if (userFilter) {
                     const ids = userFilter.split(",").map(id => parseInt(id)).filter(id => !isNaN(id));
                     if (ids.length > 0) {
@@ -117,7 +115,7 @@ const server = Bun.serve({
 
                 query += ` GROUP BY t.id ORDER BY t.created_at ASC`;
 
-                const todos = db.query(query).all(...params).map((t: any) => ({
+                const todos = db.query(query).all(...params).map((t: { completed: number; labels: string | null; }) => ({
                     ...t,
                     completed: !!t.completed,
                     labels: t.labels ? t.labels.split(',') : []
@@ -195,7 +193,7 @@ const server = Bun.serve({
     },
     websocket: {
         open(ws) { ws.subscribe("todos"); },
-        message(ws, message) { },
+        message(_ws, _message) { },
         close(ws) { ws.unsubscribe("todos"); },
     },
 });

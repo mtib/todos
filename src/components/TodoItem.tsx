@@ -69,8 +69,8 @@ export function TodoItem({
 
     // Component to render labels in markdown
     const MarkdownComponents = {
-        p: ({ children }: any) => {
-            const processChild = (child: any): any => {
+        p: ({ children }: { children: React.ReactNode }) => {
+            const processChild = (child: React.ReactNode): React.ReactNode => {
                 if (typeof child === 'string') {
                     const parts = child.split(/(@\w+)/g);
                     return parts.map((part, i) =>

@@ -18,8 +18,17 @@ export const TopBar = ({
     theme,
     toggleTheme
 }: {
-    stats: any,
-    users: any[],
+    stats: {
+        username: string,
+        currentUserTasks: number,
+        taskCount: number,
+        dbSize: number,
+        memory: number
+    },
+    users: {
+        id: number,
+        username: string
+    }[],
     selectedUserIds: number[],
     toggleUserSelection: (userId: number) => void,
     theme: 'light' | 'dark',
