@@ -105,12 +105,15 @@ export function useTodos() {
         const searchId = idMatch ? parseInt(idMatch[1]) : null
 
         const filteredTodos = todos.filter(todo => {
-            // If hide completed and it is completed, filter it out
-            // BUT only if we are not searching for its specific ID
-            if (!showCompleted && todo.completed && searchId !== todo.id) return false
+            const isIdMatch = searchId === todo.id;
+
+            // Stricter filtering for completed tasks:
+            // If hide completed is on, and the todo is completed, hide it.
+            // Exception only for direct ID matches.
+            if (!showCompleted && todo.completed && !isIdMatch) return false
 
             if (!q) return true
-            if (searchId !== null) return todo.id === searchId
+            if (isIdMatch) return true
 
             return todo.labels?.some(l => l.toLowerCase().includes(q)) ||
                 todo.text.toLowerCase().includes(q) ||
@@ -148,8 +151,20 @@ export function useTodos() {
 
         const filterBySearch = (nodes: TodoNode[]): TodoNode[] => {
             return nodes.filter(node => {
-                const childrenMatch = filterBySearch(node.children)
                 const nodeMatches = visibleIds.has(node.id)
+                const childrenMatch = filterBySearch(node.children)
+
+                // Behavior change:
+                // If there is NO search query, a parent MUST match (be uncompleted) to be shown.
+                // If there IS a search query, we allow showing parents to preserve the path to matches.
+                if (!q) {
+                    if (nodeMatches) {
+                        node.children = childrenMatch
+                        return true
+                    }
+                    return false
+                }
+
                 if (nodeMatches || childrenMatch.length > 0) {
                     node.children = childrenMatch
                     return true

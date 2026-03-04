@@ -195,7 +195,7 @@ export function TodoItem({
                             className="flex items-center space-x-1"
                         >
                             <Input
-                                placeholder="+"
+                                placeholder="Add..."
                                 value={subtaskInput}
                                 onChange={(e) => onSubtaskInputChange(node.id, e.target.value)}
                                 className="h-8 w-8 sm:h-7 sm:w-20 text-[11px] bg-muted/20 border-dashed focus:w-40 transition-all p-1.5 border-slate-200 dark:border-slate-800"
