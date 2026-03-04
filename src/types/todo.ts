@@ -11,4 +11,5 @@ export interface Todo {
 export interface TodoNode extends Todo {
     children: TodoNode[]
     progress: number
+    childCount: number
 }

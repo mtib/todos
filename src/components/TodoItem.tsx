@@ -54,8 +54,13 @@ export function TodoItem({
     }
 
     const handleDescriptionSubmit = () => {
-        onUpdateTodo(node.id, { description: descriptionText })
+        // If text is empty, we send empty string to "remove" it and show the add button again
+        onUpdateTodo(node.id, { description: descriptionText.trim() })
         setEditingDescription(false)
+        // If it was empty, we also hide the section unless it was explicitly toggled open
+        if (!descriptionText.trim()) {
+            setShowDescription(false)
+        }
     }
 
     const copyToClipboard = (text: string) => {
@@ -82,9 +87,13 @@ export function TodoItem({
 
     const handleDescriptionToggle = (e: React.MouseEvent) => {
         e.stopPropagation()
-        setShowDescription(!showDescription)
-        if (!showDescription && !node.description) {
+        const newShow = !showDescription
+        setShowDescription(newShow)
+
+        // If we are opening it and there is no description, jump to edit
+        if (newShow && !node.description) {
             setEditingDescription(true)
+            setDescriptionText('')
         }
     }
 
@@ -130,7 +139,7 @@ export function TodoItem({
 
                     <div className="flex items-center gap-1.5 min-w-0 flex-1">
                         <div
-                            className="hidden sm:flex items-center gap-1 bg-muted/60 rounded px-1.5 py-0.5 group/id cursor-pointer hover:bg-muted transition-colors shrink-0"
+                            className="flex items-center gap-1 bg-muted/60 rounded px-1.5 py-0.5 group/id cursor-pointer hover:bg-muted transition-colors shrink-0"
                             onClick={(e) => {
                                 e.stopPropagation()
                                 copyToClipboard(`T${node.id}`)
@@ -243,7 +252,7 @@ export function TodoItem({
                 </div>
 
                 {/* Seamless Integrated Description Section */}
-                {(showDescription || (node.description && !editingDescription)) && (
+                {(showDescription || node.description || editingDescription) && (
                     <div className="px-3 sm:px-10 pb-4">
                         {editingDescription ? (
                             <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
@@ -258,7 +267,8 @@ export function TodoItem({
                                         if (e.key === 'Escape') setEditingDescription(false)
                                     }}
                                     onBlur={() => {
-                                        if (descriptionText === (node.description || '')) {
+                                        // Only auto-close if the content hasn't changed or is empty
+                                        if (descriptionText.trim() === (node.description || '').trim()) {
                                             setEditingDescription(false)
                                         }
                                     }}
@@ -284,7 +294,10 @@ export function TodoItem({
                                 <Button
                                     variant="ghost"
                                     className="h-10 sm:h-8 w-full border border-dashed text-xs text-muted-foreground hover:text-foreground"
-                                    onClick={() => setEditingDescription(true)}
+                                    onClick={() => {
+                                        setEditingDescription(true)
+                                        setDescriptionText('')
+                                    }}
                                 >
                                     Add a description...
                                 </Button>
@@ -294,7 +307,7 @@ export function TodoItem({
                 )}
 
                 {/* Progress Bar along the bottom */}
-                {hasChildren && (
+                {node.childCount > 0 && (
                     <div className="absolute bottom-0 left-0 right-0 h-[4px] sm:h-[3px] bg-slate-100/30 dark:bg-purple-900/10">
                         <div
                             className="h-full bg-purple-600 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-in-out"

@@ -107,9 +107,6 @@ export function useTodos() {
         const filteredTodos = todos.filter(todo => {
             const isIdMatch = searchId === todo.id;
 
-            // Stricter filtering for completed tasks:
-            // If hide completed is on, and the todo is completed, hide it.
-            // Exception only for direct ID matches.
             if (!showCompleted && todo.completed && !isIdMatch) return false
 
             if (!q) return true
@@ -121,22 +118,21 @@ export function useTodos() {
         })
 
         const nodes: Record<number, TodoNode> = {}
-        const rootNodes: TodoNode[] = []
 
+        // Initial tree construction to get actual child counts
         todos.forEach(todo => {
-            nodes[todo.id] = { ...todo, children: [], progress: 0 }
+            nodes[todo.id] = { ...todo, children: [], progress: 0, childCount: 0 }
         })
-
-        const visibleIds = new Set(filteredTodos.map(t => t.id))
 
         todos.forEach(todo => {
             const node = nodes[todo.id]
             if (todo.parent_id && nodes[todo.parent_id]) {
                 nodes[todo.parent_id].children.push(node)
-            } else {
-                rootNodes.push(node)
+                nodes[todo.parent_id].childCount++
             }
         })
+
+        const visibleIds = new Set(filteredTodos.map(t => t.id))
 
         const calculateProgress = (node: TodoNode) => {
             if (node.children.length === 0) {
@@ -147,16 +143,21 @@ export function useTodos() {
             node.children.forEach(calculateProgress)
         }
 
-        rootNodes.forEach(calculateProgress)
+        // We need to keep rootNodes separate for the final tree
+        const topLevelNodes: TodoNode[] = []
+        todos.forEach(todo => {
+            if (!todo.parent_id || !nodes[todo.parent_id]) {
+                topLevelNodes.push(nodes[todo.id])
+            }
+        })
+
+        topLevelNodes.forEach(calculateProgress)
 
         const filterBySearch = (nodes: TodoNode[]): TodoNode[] => {
             return nodes.filter(node => {
                 const nodeMatches = visibleIds.has(node.id)
                 const childrenMatch = filterBySearch(node.children)
 
-                // Behavior change:
-                // If there is NO search query, a parent MUST match (be uncompleted) to be shown.
-                // If there IS a search query, we allow showing parents to preserve the path to matches.
                 if (!q) {
                     if (nodeMatches) {
                         node.children = childrenMatch
@@ -173,7 +174,7 @@ export function useTodos() {
             })
         }
 
-        return (q || !showCompleted) ? filterBySearch(rootNodes) : rootNodes
+        return (q || !showCompleted) ? filterBySearch(topLevelNodes) : topLevelNodes
     }, [todos, searchQuery, showCompleted])
 
     return {

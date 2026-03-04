@@ -25,7 +25,6 @@ function App() {
   } = useTodos()
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    // Rely on classes initially set by the inline script in index.html to avoid state mismatch
     if (typeof window !== 'undefined') {
       if (document.documentElement.classList.contains('dark')) return 'dark'
       if (document.documentElement.classList.contains('light')) return 'light'
@@ -50,22 +49,24 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
-      {/* Theme Toggle in absolute position */}
-      <div className="fixed top-4 right-4 z-50">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors">
+      {/* Theme Toggle - Positioned for mobile accessibility without overlap */}
+      <div className="fixed top-4 right-4 z-50 sm:top-6 sm:right-6">
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors h-10 w-10">
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="space-y-10">
-          <TodoForm
-            onAddTodo={(text) => addTodo(text)}
-            onSearch={setSearchQuery}
-            searchQuery={searchQuery}
-            showCompleted={showCompleted}
-            onToggleCompleted={() => setShowCompleted(!showCompleted)}
-          />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 sm:py-16">
+        <div className="space-y-8 sm:space-y-10">
+          <div className="relative pt-0 sm:pt-0">
+            <TodoForm
+              onAddTodo={(text) => addTodo(text)}
+              onSearch={setSearchQuery}
+              searchQuery={searchQuery}
+              showCompleted={showCompleted}
+              onToggleCompleted={() => setShowCompleted(!showCompleted)}
+            />
+          </div>
 
           <div className="w-full">
             <TodoTree
