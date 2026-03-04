@@ -35,7 +35,10 @@ db.run(`
 `);
 
 // Migrations for existing DBs
-db.run("ALTER TABLE todos ADD COLUMN owner_id INTEGER REFERENCES users(id);");
+const columns = db.query("PRAGMA table_info(todos)").all() as { name: string }[];
+if (!columns.find(c => c.name === 'owner_id')) {
+    db.run("ALTER TABLE todos ADD COLUMN owner_id INTEGER REFERENCES users(id);");
+}
 
 db.run(`
   CREATE TABLE IF NOT EXISTS labels (
