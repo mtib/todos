@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTodos } from './hooks/useTodos'
 import { TodoTree } from './components/TodoTree'
 import { TodoForm } from './components/TodoForm'
-import { TopBar } from './components/TopBar'
+import { Footer } from './components/Footer'
 
 function App() {
   const {
@@ -27,28 +27,12 @@ function App() {
     setShowCompleted
   } = useTodos()
 
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      if (document.documentElement.classList.contains('dark')) return 'dark'
-      if (document.documentElement.classList.contains('light')) return 'light'
-
-      const saved = localStorage.getItem('theme')
-      if (saved === 'light' || saved === 'dark') return saved
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'light'
-  })
-
   useEffect(() => {
     const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
-    root.classList.add(theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    root.classList.toggle('dark', prefersDark)
+    root.classList.toggle('light', !prefersDark)
+  }, [])
 
   const toggleUserSelection = (userId: number) => {
     setSelectedUserIds((prev: number[]) =>
@@ -59,25 +43,19 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300 px-4 sm:px-6">
-      <TopBar
-        stats={stats}
-        users={users}
-        selectedUserIds={selectedUserIds}
-        toggleUserSelection={toggleUserSelection}
-        theme={theme}
-        toggleTheme={toggleTheme}
-      />
-
-      <div className="max-w-4xl mx-auto py-4 lg:pt-12">
+    <div className="min-h-screen bg-background transition-colors duration-300 flex flex-col items-center p-4 sm:p-6">
+      <div className="w-full max-w-4xl mt-4 flex-grow">
         <div className="space-y-8 sm:space-y-10">
-          <div className="relative pt-0 sm:pt-0">
+          <div className="relative">
             <TodoForm
               onAddTodo={(text) => addTodo(text)}
               onSearch={setSearchQuery}
               searchQuery={searchQuery}
               showCompleted={showCompleted}
               onToggleCompleted={() => setShowCompleted(!showCompleted)}
+              users={users}
+              selectedUserIds={selectedUserIds}
+              toggleUserSelection={toggleUserSelection}
             />
           </div>
 
@@ -98,6 +76,7 @@ function App() {
           </div>
         </div>
       </div>
+      <Footer stats={stats} />
     </div>
   )
 }

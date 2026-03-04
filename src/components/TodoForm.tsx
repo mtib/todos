@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Plus, Eye, EyeOff } from "lucide-react"
+import { Plus, Eye, EyeOff, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface TodoFormProps {
     onAddTodo: (text: string) => void
@@ -10,6 +11,12 @@ interface TodoFormProps {
     searchQuery: string
     showCompleted: boolean
     onToggleCompleted: () => void
+    users: {
+        id: number,
+        username: string
+    }[],
+    selectedUserIds: number[],
+    toggleUserSelection: (userId: number) => void
 }
 
 export function TodoForm({
@@ -17,71 +24,80 @@ export function TodoForm({
     onSearch,
     searchQuery,
     showCompleted,
-    onToggleCompleted
+    onToggleCompleted,
+    users,
+    selectedUserIds,
+    toggleUserSelection,
 }: TodoFormProps) {
-    const [text, setText] = useState('')
-    const [isSearchMode, setIsSearchMode] = useState(false)
+    const [isUserFilterOpen, setIsUserFilterOpen] = useState(false)
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        if (isSearchMode) return
-
-        if (text.trim()) {
-            onAddTodo(text)
-            setText('')
-        }
-    }
-
-    const toggleMode = () => {
-        setIsSearchMode(!isSearchMode)
-        if (isSearchMode) {
+        if (searchQuery.trim()) {
+            onAddTodo(searchQuery)
             onSearch('')
         }
     }
 
     return (
         <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 group/modes">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMode}
-                    className={cn(
-                        "h-10 w-10 shrink-0 rounded-full transition-all",
-                        isSearchMode ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+            {users.length > 1 && (
+                <div className="relative">
+                    <Button variant="ghost" size="icon" onClick={() => setIsUserFilterOpen(!isUserFilterOpen)} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors h-10 w-10">
+                        <Users className="h-5 w-5" />
+                    </Button>
+                    {isUserFilterOpen && (
+                        <div className="absolute top-12 left-0 bg-background z-50 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl p-1.5 shadow-xl flex flex-col max-h-[400px] overflow-y-auto w-48">
+                            <div className="flex flex-col gap-0.5 mt-1">
+                                {users.map(user => {
+                                    const isSelected = selectedUserIds.includes(user.id)
+                                    return (
+                                        <label
+                                            key={user.id}
+                                            className={cn(
+                                                "flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-muted group/user cursor-pointer",
+                                                isSelected ? "text-primary bg-primary/5" : "text-muted-foreground"
+                                            )}
+                                        >
+                                            <Checkbox
+                                                checked={isSelected}
+                                                onCheckedChange={() => toggleUserSelection(user.id)}
+                                                className="h-5 w-5 shrink-0"
+                                            />
+                                            <span className="text-xs truncate">
+                                                {user.username}
+                                            </span>
+                                        </label>
+                                    )
+                                })}
+                            </div>
+                        </div>
                     )}
-                    title={isSearchMode ? "Exit Search" : "Search Tasks"}
-                >
-                    <Search className="h-5 w-5" />
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onToggleCompleted}
-                    className={cn(
-                        "h-10 w-10 shrink-0 rounded-full transition-all",
-                        !showCompleted ? "bg-orange-500/10 text-orange-600 dark:text-orange-400" : "text-muted-foreground hover:bg-muted"
-                    )}
-                    title={showCompleted ? "Hide Completed" : "Show Completed"}
-                >
-                    {showCompleted ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
-                </Button>
-            </div>
+                </div>
+            )}
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleCompleted}
+                className={cn(
+                    "h-10 w-10 shrink-0 rounded-full transition-all",
+                    !showCompleted ? "bg-orange-500/10 text-orange-600 dark:text-orange-400" : "text-muted-foreground hover:bg-muted"
+                )}
+                title={showCompleted ? "Hide Completed" : "Show Completed"}
+            >
+                {showCompleted ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+            </Button>
 
             <form onSubmit={handleSubmit} className="flex-1 flex gap-2">
                 <Input
-                    placeholder={isSearchMode ? "Search by label (@name), text, or T<id>..." : "What needs to be done?"}
-                    value={isSearchMode ? searchQuery : text}
-                    onChange={(e) => isSearchMode ? onSearch(e.target.value) : setText(e.target.value)}
+                    placeholder="Search by label (@name), text, or T<id>... or add a new todo"
+                    value={searchQuery}
+                    onChange={(e) => onSearch(e.target.value)}
                     className="flex-1 h-10 text-base px-5 border shadow-sm rounded-full bg-background/50 focus:bg-background transition-all focus:ring-2 focus:ring-primary/20"
-                    autoFocus={isSearchMode}
                 />
-                {!isSearchMode && (
-                    <Button type="submit" size="icon" className="h-10 w-10 shrink-0 rounded-full shadow-md hover:scale-105 transition-transform active:scale-95">
-                        <Plus className="h-5 w-5" />
-                    </Button>
-                )}
+                <Button type="submit" size="icon" className="h-10 w-10 shrink-0 rounded-full shadow-md hover:scale-105 transition-transform active:scale-95">
+                    <Plus className="h-5 w-5" />
+                </Button>
             </form>
         </div>
     )
