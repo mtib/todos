@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button"
-
 const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B'
     const k = 1024
@@ -17,7 +15,7 @@ export const Footer = ({
         taskCount: number,
         dbSize: number,
         memory: number
-    }
+    } | null
 }) => {
     return (
         <div className="flex justify-center items-center w-full mt-4">

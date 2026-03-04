@@ -6,6 +6,7 @@ import { Trash2, Plus, ChevronDown, ChevronRight, FileText, Link as LinkIcon } f
 import { cn } from "@/lib/utils"
 import type { TodoNode } from '../types/todo'
 import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
 
 interface TodoItemProps {
     node: TodoNode
@@ -68,8 +69,8 @@ export function TodoItem({
     }
 
     // Component to render labels in markdown
-    const MarkdownComponents = {
-        p: ({ children }: { children: React.ReactNode }) => {
+    const MarkdownComponents: Components = {
+        p: ({ children }) => {
             const processChild = (child: React.ReactNode): React.ReactNode => {
                 if (typeof child === 'string') {
                     const parts = child.split(/(@\w+)/g);
