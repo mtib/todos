@@ -11,6 +11,7 @@ interface TodoItemProps {
     node: TodoNode
     depth?: number
     isExpanded: boolean
+    isLastChild: boolean
     onToggleExpand: (id: number) => void
     onToggleTodo: (id: number, completed: boolean) => void
     onDeleteTodo: (id: number) => void
@@ -20,13 +21,14 @@ interface TodoItemProps {
     onToggleRecursive: (node: TodoNode, expand: boolean) => void
     subtaskInput: string
     onSubtaskInputChange: (parentId: number, text: string) => void
-    renderChildren: (node: TodoNode, depth: number) => React.ReactNode
+    renderChildren: (nodes: TodoNode[], depth: number) => React.ReactNode
 }
 
 export function TodoItem({
     node,
     depth = 0,
     isExpanded,
+    isLastChild,
     onToggleExpand,
     onToggleTodo,
     onDeleteTodo,
@@ -106,13 +108,23 @@ export function TodoItem({
     }
 
     return (
-        <div className="group/item py-1">
+        <div className="group/item py-1 relative">
+            {depth > 0 && (
+                <>
+                    {/* Vertical line from parent */}
+                    <div className={cn(
+                        "absolute -left-3.5 top-0 w-px bg-slate-200 dark:bg-slate-800",
+                        isLastChild ? "h-7" : "h-full"
+                    )} />
+                    {/* Horizontal line to child */}
+                    <div className="absolute -left-3.5 top-6 h-px w-3 bg-slate-200 dark:bg-slate-800" />
+                </>
+            )}
             <div
-                style={{ marginLeft: `${Math.min(depth * 16, 120)}px` }}
+                style={{ marginLeft: `${Math.min(depth * 28, 120)}px` }}
                 className={cn(
                     "flex flex-col rounded-lg transition-all duration-200 border relative overflow-hidden",
                     "bg-card/40 dark:bg-card/10 border-slate-200 dark:border-slate-800 shadow-sm",
-                    depth > 0 ? "border-l-primary/40" : "border-slate-200 dark:border-slate-800",
                     "hover:border-slate-300 dark:hover:border-slate-700 hover:bg-card/60 dark:hover:bg-card/15 hover:shadow-md",
                     "active:scale-[0.99] md:active:scale-100 transition-transform",
                     node.completed && "opacity-80"
@@ -321,7 +333,7 @@ export function TodoItem({
 
             {isExpanded && node.children.length > 0 && (
                 <div className="mt-1">
-                    {node.children.map(child => renderChildren(child, depth + 1))}
+                    {renderChildren(node.children, depth + 1)}
                 </div>
             )}
         </div>
