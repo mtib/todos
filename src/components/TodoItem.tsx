@@ -289,7 +289,7 @@ export function TodoItem({
                                     </ReactMarkdown>
                                 </div>
                             </div>
-                        ) : showDescription && (
+                        ) : (showDescription && !node.description) && (
                             <div className="border-t border-slate-100 dark:border-slate-800/50 pt-3">
                                 <Button
                                     variant="ghost"
