@@ -1,6 +1,7 @@
-import { Moon, Sun, Users, UserCheck } from "lucide-react"
+import { Moon, Sun, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { Checkbox } from "@/components/ui/checkbox"
 
 const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B'
@@ -50,24 +51,22 @@ export const TopBar = ({
                                 {users.map(user => {
                                     const isSelected = selectedUserIds.includes(user.id)
                                     return (
-                                        <button
+                                        <label
                                             key={user.id}
-                                            onClick={() => toggleUserSelection(user.id)}
                                             className={cn(
-                                                "flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-muted group/user",
+                                                "flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-muted group/user cursor-pointer",
                                                 isSelected ? "text-primary bg-primary/5" : "text-muted-foreground"
                                             )}
                                         >
-                                            <div className={cn(
-                                                "h-5 w-5 rounded-md border flex items-center justify-center transition-colors shrink-0",
-                                                isSelected ? "bg-primary border-primary text-primary-foreground" : "border-slate-200 dark:border-slate-800"
-                                            )}>
-                                                {isSelected && <UserCheck className="h-3 w-3" />}
-                                            </div>
+                                            <Checkbox
+                                                checked={isSelected}
+                                                onCheckedChange={() => toggleUserSelection(user.id)}
+                                                className="h-5 w-5 shrink-0"
+                                            />
                                             <span className="text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                                 {user.username}
                                             </span>
-                                        </button>
+                                        </label>
                                     )
                                 })}
                             </div>
@@ -123,24 +122,22 @@ export const TopBar = ({
                                 {users.map(user => {
                                     const isSelected = selectedUserIds.includes(user.id)
                                     return (
-                                        <button
+                                        <label
                                             key={user.id}
-                                            onClick={() => toggleUserSelection(user.id)}
                                             className={cn(
-                                                "flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-muted group/user",
+                                                "flex items-center gap-3 p-2 rounded-xl transition-all hover:bg-muted group/user cursor-pointer",
                                                 isSelected ? "text-primary bg-primary/5" : "text-muted-foreground"
                                             )}
                                         >
-                                            <div className={cn(
-                                                "h-5 w-5 rounded-md border flex items-center justify-center transition-colors shrink-0",
-                                                isSelected ? "bg-primary border-primary text-primary-foreground" : "border-slate-200 dark:border-slate-800"
-                                            )}>
-                                                {isSelected && <UserCheck className="h-3 w-3" />}
-                                            </div>
+                                            <Checkbox
+                                                checked={isSelected}
+                                                onCheckedChange={() => toggleUserSelection(user.id)}
+                                                className="h-5 w-5 shrink-0"
+                                            />
                                             <span className="text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                                 {user.username}
                                             </span>
-                                        </button>
+                                        </label>
                                     )
                                 })}
                             </div>
