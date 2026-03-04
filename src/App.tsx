@@ -61,7 +61,7 @@ function App() {
   }
 
   const toggleUserSelection = (userId: number) => {
-    setSelectedUserIds(prev =>
+    setSelectedUserIds((prev: number[]) =>
       prev.includes(userId)
         ? prev.filter(id => id !== userId)
         : [...prev, userId]
@@ -147,7 +147,7 @@ function App() {
               tree={todoTree}
               expanded={expanded}
               subtaskInputs={subtaskInputs}
-              onToggleExpand={(id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))}
+              onToggleExpand={(id) => setExpanded((prev: Record<number, boolean>) => ({ ...prev, [id]: !prev[id] }))}
               onToggleTodo={toggleTodo}
               onDeleteTodo={deleteTodo}
               onRenameTodo={renameTodo}
