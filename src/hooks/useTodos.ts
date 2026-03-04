@@ -2,8 +2,15 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { Todo, TodoNode } from '../types/todo'
 import { api } from '../lib/api'
 
+export interface SystemStats {
+    taskCount: number;
+    dbSize: number;
+    memory: number;
+}
+
 export function useTodos() {
     const [todos, setTodos] = useState<Todo[]>([])
+    const [stats, setStats] = useState<SystemStats | null>(null)
     const [expanded, setExpanded] = useState<Record<number, boolean>>({})
     const [subtaskInputs, setSubtaskInputs] = useState<Record<number, string>>({})
     const [isLoading, setIsLoading] = useState(true)
@@ -12,12 +19,16 @@ export function useTodos() {
         return saved === null ? true : saved === 'true'
     })
 
-    const fetchTodos = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const data = await api.fetchTodos()
-            setTodos(data)
+            const [todosData, statsData] = await Promise.all([
+                api.fetchTodos(),
+                api.fetchStats()
+            ])
+            setTodos(todosData)
+            setStats(statsData)
         } catch (error) {
-            console.error("Failed to fetch todos:", error)
+            console.error("Failed to fetch data:", error)
         } finally {
             setIsLoading(false)
         }
@@ -28,13 +39,13 @@ export function useTodos() {
     }, [showCompleted])
 
     useEffect(() => {
-        fetchTodos()
+        fetchData()
 
-        const socket = api.getWebSocket(fetchTodos)
+        const socket = api.getWebSocket(fetchData)
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                fetchTodos()
+                fetchData()
             }
         }
         document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -43,7 +54,7 @@ export function useTodos() {
             socket.close()
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
-    }, [fetchTodos])
+    }, [fetchData])
 
     const addTodo = async (text: string, parentId: number | null = null) => {
         if (!text.trim()) return
@@ -54,7 +65,7 @@ export function useTodos() {
                 setSubtaskInputs(prev => ({ ...prev, [parentId]: '' }))
                 setExpanded(prev => ({ ...prev, [parentId]: true }))
             }
-            fetchTodos()
+            fetchData()
         } catch (error) {
             console.error("Failed to add todo:", error)
         }
@@ -63,7 +74,7 @@ export function useTodos() {
     const updateTodo = async (id: number, updates: { text?: string; completed?: boolean; description?: string }) => {
         try {
             await api.updateTodo(id, updates)
-            fetchTodos()
+            fetchData()
         } catch (error) {
             console.error("Failed to update todo:", error)
         }
@@ -81,7 +92,7 @@ export function useTodos() {
     const deleteTodo = async (id: number) => {
         try {
             await api.deleteTodo(id)
-            fetchTodos()
+            fetchData()
         } catch (error) {
             console.error("Failed to delete todo:", error)
         }
@@ -143,7 +154,6 @@ export function useTodos() {
             node.children.forEach(calculateProgress)
         }
 
-        // We need to keep rootNodes separate for the final tree
         const topLevelNodes: TodoNode[] = []
         todos.forEach(todo => {
             if (!todo.parent_id || !nodes[todo.parent_id]) {
@@ -180,6 +190,7 @@ export function useTodos() {
     return {
         todos,
         todoTree,
+        stats,
         expanded,
         setExpanded,
         subtaskInputs,

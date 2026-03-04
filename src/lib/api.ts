@@ -7,6 +7,12 @@ export const api = {
         return res.json();
     },
 
+    async fetchStats() {
+        const res = await fetch(`${API_BASE_URL}/api/stats`);
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        return res.json();
+    },
+
     async addTodo(text: string, parentId: number | null = null) {
         const res = await fetch(`${API_BASE_URL}/api/todos`, {
             method: 'POST',

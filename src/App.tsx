@@ -5,88 +5,107 @@ import { TodoForm } from './components/TodoForm'
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-function App() {
-  const {
-    todoTree,
-    expanded,
-    setExpanded,
-    subtaskInputs,
-    setSubtaskInputs,
-    addTodo,
-    toggleTodo,
-    deleteTodo,
-    renameTodo,
-    updateTodo,
-    toggleRecursive,
-    searchQuery,
-    setSearchQuery,
-    showCompleted,
-    setShowCompleted
-  } = useTodos()
+const formatBytes = (bytes: number) => {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      if (document.documentElement.classList.contains('dark')) return 'dark'
-      if (document.documentElement.classList.contains('light')) return 'light'
+const {
+  todoTree,
+  stats,
+  expanded,
+  setExpanded,
+  subtaskInputs,
+  setSubtaskInputs,
+  addTodo,
+  toggleTodo,
+  deleteTodo,
+  renameTodo,
+  updateTodo,
+  toggleRecursive,
+  searchQuery,
+  setSearchQuery,
+  showCompleted,
+  setShowCompleted
+} = useTodos()
 
-      const saved = localStorage.getItem('theme')
-      if (saved === 'light' || saved === 'dark') return saved
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'light'
-  })
+const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+  if (typeof window !== 'undefined') {
+    if (document.documentElement.classList.contains('dark')) return 'dark'
+    if (document.documentElement.classList.contains('light')) return 'light'
 
-  useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
-    root.classList.add(theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    const saved = localStorage.getItem('theme')
+    if (saved === 'light' || saved === 'dark') return saved
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
+  return 'light'
+})
 
-  return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      {/* Theme Toggle - Positioned for mobile accessibility without overlap */}
-      <div className="fixed top-4 right-4 z-50 sm:top-6 sm:right-6">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors h-10 w-10">
-          {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-        </Button>
+useEffect(() => {
+  const root = window.document.documentElement
+  root.classList.remove('light', 'dark')
+  root.classList.add(theme)
+  localStorage.setItem('theme', theme)
+}, [theme])
+
+const toggleTheme = () => {
+  setTheme(prev => prev === 'light' ? 'dark' : 'light')
+}
+
+return (
+  <div className="min-h-screen bg-background transition-colors duration-300">
+    {/* System Stats - Center Top */}
+    {stats && (
+      <div className="fixed top-2 left-0 right-0 z-40 flex justify-center pointer-events-none">
+        <div className="text-[10px] font-mono text-muted-foreground/40 space-x-3 bg-background/20 backdrop-blur-[2px] px-3 py-1 rounded-full border border-slate-200/10">
+          <span>Tasks: {stats.taskCount}</span>
+          <span>DB: {formatBytes(stats.dbSize)}</span>
+          <span>Mem: {formatBytes(stats.memory)}</span>
+        </div>
       </div>
+    )}
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 sm:py-16">
-        <div className="space-y-8 sm:space-y-10">
-          <div className="relative pt-0 sm:pt-0">
-            <TodoForm
-              onAddTodo={(text) => addTodo(text)}
-              onSearch={setSearchQuery}
-              searchQuery={searchQuery}
-              showCompleted={showCompleted}
-              onToggleCompleted={() => setShowCompleted(!showCompleted)}
-            />
-          </div>
+    {/* Theme Toggle - Positioned for mobile accessibility without overlap */}
+    <div className="fixed top-4 right-4 z-50 sm:top-6 sm:right-6">
+      <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full shadow-sm bg-background/50 backdrop-blur-sm border hover:bg-muted transition-colors h-10 w-10">
+        {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+      </Button>
+    </div>
 
-          <div className="w-full">
-            <TodoTree
-              tree={todoTree}
-              expanded={expanded}
-              subtaskInputs={subtaskInputs}
-              onToggleExpand={(id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))}
-              onToggleTodo={toggleTodo}
-              onDeleteTodo={deleteTodo}
-              onRenameTodo={renameTodo}
-              onAddSubtask={addTodo}
-              onToggleRecursive={toggleRecursive}
-              onSubtaskInputChange={(id, text) => setSubtaskInputs(prev => ({ ...prev, [id]: text }))}
-              onUpdateTodo={updateTodo}
-            />
-          </div>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 sm:py-16">
+      <div className="space-y-8 sm:space-y-10">
+        <div className="relative pt-0 sm:pt-0">
+          <TodoForm
+            onAddTodo={(text) => addTodo(text)}
+            onSearch={setSearchQuery}
+            searchQuery={searchQuery}
+            showCompleted={showCompleted}
+            onToggleCompleted={() => setShowCompleted(!showCompleted)}
+          />
+        </div>
+
+        <div className="w-full">
+          <TodoTree
+            tree={todoTree}
+            expanded={expanded}
+            subtaskInputs={subtaskInputs}
+            onToggleExpand={(id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }))}
+            onToggleTodo={toggleTodo}
+            onDeleteTodo={deleteTodo}
+            onRenameTodo={renameTodo}
+            onAddSubtask={addTodo}
+            onToggleRecursive={toggleRecursive}
+            onSubtaskInputChange={(id, text) => setSubtaskInputs(prev => ({ ...prev, [id]: text }))}
+            onUpdateTodo={updateTodo}
+          />
         </div>
       </div>
     </div>
-  )
+  </div>
+)
 }
 
 export default App

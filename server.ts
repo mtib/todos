@@ -124,6 +124,15 @@ const server = Bun.serve({
             }
         }
 
+        if (path === "/api/stats") {
+            const stats = {
+                taskCount: (db.query("SELECT COUNT(*) as count FROM todos").get() as { count: number }).count,
+                dbSize: fs.statSync(dbPath).size,
+                memory: process.memoryUsage().rss
+            };
+            return Response.json(stats);
+        }
+
         if (path.startsWith("/api/todos/")) {
             const id = parseInt(path.split("/").pop() || "");
             if (isNaN(id)) return new Response("Invalid ID", { status: 400 });
