@@ -41,15 +41,7 @@ export function useTodos() {
             setUsers(usersData)
             setStats(statsData)
 
-            // If no users selected, by default select all
-            let currentSelected = selectedUserIds
-            if (currentSelected.length === 0 && usersData.length > 0) {
-                currentSelected = usersData.map((u: User) => u.id)
-                setSelectedUserIds(currentSelected)
-                localStorage.setItem('selectedUserIds', JSON.stringify(currentSelected))
-            }
-
-            const todosData = await api.fetchTodos(currentSelected)
+            const todosData = await api.fetchTodos(selectedUserIds)
             setTodos(todosData)
         } catch (error) {
             console.error("Failed to fetch data:", error)
