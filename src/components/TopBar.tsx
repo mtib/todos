@@ -37,7 +37,7 @@ export const TopBar = ({
 }) => {
     return (
         <>
-            <div className="md:hidden flex justify-between items-center p-4">
+            <div className="lg:hidden flex justify-between items-center p-4">
                 {/* User Selector */}
                 <div className="group">
                     <div className="flex flex-col gap-2">
@@ -93,7 +93,7 @@ export const TopBar = ({
                 </Button>
             </div>
 
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
                 {/* System Stats - Center Top */}
                 {stats && (
                     <div className="fixed top-2 left-0 right-0 z-40 flex justify-center pointer-events-none">
