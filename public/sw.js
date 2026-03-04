@@ -2,7 +2,8 @@ const CACHE_NAME = 'todo-pwa-v2'; // Bumped version
 const ASSETS_TO_CACHE = [
     '/',
     '/manifest.json',
-    '/icon.png'
+    '/check.jpg',
+    '/check_transparent.png'
 ];
 
 self.addEventListener('install', (event) => {

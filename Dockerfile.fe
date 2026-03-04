@@ -13,5 +13,5 @@ FROM caddy:alpine
 COPY Caddyfile /etc/caddy/Caddyfile
 # Copy built files to the directory Caddy serves
 COPY --from=builder /app/dist /usr/share/caddy
-EXPOSE 80
+EXPOSE 80 81
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]

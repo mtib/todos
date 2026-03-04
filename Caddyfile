@@ -24,3 +24,23 @@
         try_files {path} /index.html
     }
 }
+
+:81 {
+    # Partner mode: hardcode the user header
+    handle /api/* {
+        reverse_proxy {$BACKEND_URL:backend:3000} {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up Tailscale-User "Partner"
+        }
+    }
+
+    # Static file serving (same as :80)
+    handle {
+        root * /usr/share/caddy
+        file_server {
+            precompressed
+        }
+        try_files {path} /index.html
+    }
+}
