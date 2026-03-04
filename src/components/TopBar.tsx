@@ -37,7 +37,7 @@ export const TopBar = ({
 }) => {
     return (
         <>
-            <div className="lg:hidden flex justify-between items-center p-4">
+            <div className="lg:hidden flex justify-between items-center">
                 {/* User Selector */}
                 <div className="group">
                     <div className="flex flex-col gap-2">

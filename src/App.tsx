@@ -59,7 +59,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-background transition-colors duration-300 px-4 sm:px-6">
       <TopBar
         stats={stats}
         users={users}
@@ -69,7 +69,7 @@ function App() {
         toggleTheme={toggleTheme}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 sm:py-16">
+      <div className="max-w-4xl mx-auto py-8 lg:pt-16">
         <div className="space-y-8 sm:space-y-10">
           <div className="relative pt-0 sm:pt-0">
             <TodoForm
