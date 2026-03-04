@@ -295,9 +295,9 @@ export function TodoItem({
 
                 {/* Progress Bar along the bottom */}
                 {hasChildren && (
-                    <div className="absolute bottom-0 left-0 right-0 h-[4px] sm:h-[3px] bg-slate-100/50 dark:bg-purple-900/10">
+                    <div className="absolute bottom-0 left-0 right-0 h-[4px] sm:h-[3px] bg-slate-100/30 dark:bg-purple-900/10">
                         <div
-                            className="h-full bg-gradient-to-r from-purple-500/40 to-primary/60 transition-all duration-700 ease-in-out"
+                            className="h-full bg-purple-600 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-in-out"
                             style={{ width: `${node.progress}%` }}
                         />
                     </div>
