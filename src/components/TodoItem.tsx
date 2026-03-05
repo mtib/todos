@@ -107,12 +107,7 @@ export function TodoItem({
     }
 
     return (
-        <div
-            className="group/item"
-            style={{
-                marginLeft: depth > 0 ? '32px' : '0px'
-            }}
-        >
+        <div className="group/item">
             <div
                 className={cn(
                     "flex flex-col rounded-lg transition-all duration-200 border overflow-hidden relative",
@@ -324,7 +319,14 @@ export function TodoItem({
             </div>
 
             {isExpanded && node.children.length > 0 && (
-                <div className="space-y-2 pt-2">
+                <div className="ml-2 pl-6 space-y-2 pt-2 relative">
+                    {/* Vertical connector line */}
+                    <div
+                        className="absolute left-0 top-0 w-px bg-slate-200 dark:bg-slate-700 pointer-events-none"
+                        style={{
+                            height: node.children.length > 0 ? 'calc(100% - 29px)' : '0px'
+                        }}
+                    />
                     {renderChildren(node.children, depth + 1)}
                 </div>
             )}

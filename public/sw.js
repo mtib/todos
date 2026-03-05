@@ -1,4 +1,4 @@
-const CACHE_NAME = 'todo-pwa-v2'; // Bumped version
+const CACHE_NAME = 'todo-pwa-v3';
 const ASSETS_TO_CACHE = [
     '/',
     '/manifest.json',
@@ -17,7 +17,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    // Clear old caches
+    // Clear old caches and claim all open clients immediately
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -27,7 +27,7 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
 

@@ -31,22 +31,29 @@ export function TodoTree({
 
     const renderChildren = (nodes: TodoNode[], depth: number) => {
         return nodes.map((node) => (
-            <TodoItem
-                key={node.id}
-                node={node}
-                depth={depth}
-                isExpanded={!!expanded[node.id]}
-                onToggleExpand={onToggleExpand}
-                onToggleTodo={onToggleTodo}
-                onDeleteTodo={onDeleteTodo}
-                onRenameTodo={onRenameTodo}
-                onUpdateTodo={onUpdateTodo}
-                onAddSubtask={onAddSubtask}
-                onToggleRecursive={onToggleRecursive}
-                subtaskInput={subtaskInputs[node.id] || ''}
-                onSubtaskInputChange={onSubtaskInputChange}
-                renderChildren={renderChildren}
-            />
+            <div key={node.id} className={depth > 0 ? "relative" : undefined}>
+                {depth > 0 && (
+                    <div
+                        className="absolute h-px bg-slate-200 dark:bg-slate-700 pointer-events-none"
+                        style={{ top: '20px', left: '-24px', width: '24px' }}
+                    />
+                )}
+                <TodoItem
+                    node={node}
+                    depth={depth}
+                    isExpanded={!!expanded[node.id]}
+                    onToggleExpand={onToggleExpand}
+                    onToggleTodo={onToggleTodo}
+                    onDeleteTodo={onDeleteTodo}
+                    onRenameTodo={onRenameTodo}
+                    onUpdateTodo={onUpdateTodo}
+                    onAddSubtask={onAddSubtask}
+                    onToggleRecursive={onToggleRecursive}
+                    subtaskInput={subtaskInputs[node.id] || ''}
+                    onSubtaskInputChange={onSubtaskInputChange}
+                    renderChildren={renderChildren}
+                />
+            </div>
         ))
     }
 
